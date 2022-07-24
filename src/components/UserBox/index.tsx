@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/router";
-
 import { FaUserCircle } from "react-icons/fa";
 
 interface userProps {
@@ -12,6 +11,7 @@ interface userProps {
 
 export default function UserBox({ id, name, company, email }: userProps) {
     const router = useRouter();
+
     return (
         <div
             className={`w-56 h-64 border rounded-md p-4 border-sky-800 text-slate-400 relative cursor-pointer 
@@ -20,7 +20,7 @@ export default function UserBox({ id, name, company, email }: userProps) {
                 router.push(`${id}`);
             }}
         >
-            <div className="w-full line-center h-32">
+            <div className="w-full line-center h-32 relative">
                 <FaUserCircle size="4em" />
             </div>
             <div className="line-center text-center text-white">{name}</div>

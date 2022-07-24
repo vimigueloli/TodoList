@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import Loading from "react-loading";
 import toast from "react-hot-toast";
 import Todo from "components/Todo";
+import { AiOutlinePlus } from "react-icons/ai";
 
 interface todoListProps {
     user: any;
@@ -13,6 +14,8 @@ interface todoListProps {
 export default function TodoList({ user }: todoListProps) {
     const [todos, setTodos] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const [adding, setAddingd] = useState<boolean>(false);
+    const [newTodo, setNewTodo] = useState<string>("");
 
     const router = useRouter();
 
@@ -35,13 +38,39 @@ export default function TodoList({ user }: todoListProps) {
         getTodos();
     }, []);
 
-    // ! adjuste update todolist
-    async function changeItemState(id: number, idx: number) {
+    async function changeItemState(id: number) {
         let output = todos.map((item) =>
             item.id === id ? { ...item, state: !item.state } : item
         );
-        console.log("output", output[idx]);
         setTodos(output);
+    }
+
+    async function addNewTodo(e: Event) {
+        e.preventDefault();
+        try {
+            setLoading(true);
+            const response = await api.post("/todos", {
+                title: newTodo,
+                userId: user.id,
+                completed: false,
+            });
+            console.log("response ->", response.data);
+            setTodos([
+                {
+                    title: newTodo,
+                    completed: false,
+                    id: todos[todos.length - 1].id + 1,
+                },
+                ...todos,
+            ]);
+            toast.success("Tarefa adicionada com sucesso");
+            setAddingd(false);
+            setNewTodo("");
+            setLoading(false);
+        } catch (e) {
+            toast.error("Erro ao adicionar tarefa");
+            setLoading(false);
+        }
     }
 
     return (
@@ -54,12 +83,58 @@ export default function TodoList({ user }: todoListProps) {
             </div>
             <div className="mt-16 pb-32">
                 {loading && (
-                    <div className="mt-32">
+                    <div className="mt-32 line-center">
                         <Loading type="spin" color="#fff" />
                     </div>
                 )}
+
+                {
+                    // * add todo
+                    !loading && !adding && (
+                        <div className="line-center">
+                            <div
+                                className="line-center cursor-pointer rounded-lg w-6 h-6 border border-sky-800 text-sky-800
+                                hover:bg-purple-900/5 hover:text-white  with-transition"
+                                onClick={() => setAddingd(true)}
+                            >
+                                <AiOutlinePlus size="0.8em" />
+                            </div>
+                        </div>
+                    )
+                }
+                {
+                    // * add todo form
+                    !loading && adding && (
+                        <form id="new" onSubmit={(e: any) => addNewTodo(e)}>
+                            <div className="line-left pl-2 st:line-center">
+                                <div className="st:w-10/12 md:w-3/4 lg:w-1/2 mt-4 line-left items-start">
+                                    <div className="w-4 line-center mr-4">
+                                        {" "}
+                                        -
+                                    </div>
+                                    <input
+                                        className="w-full input border-b border-sky-800 bg-transparent placeholder-sky-800 pb-1 text-white"
+                                        placeholder="Adicionar tarefa"
+                                        value={newTodo}
+                                        onChange={(e) =>
+                                            setNewTodo(e.target.value)
+                                        }
+                                        required
+                                    />
+                                    <button
+                                        form="new"
+                                        className="button border border-sky-800 p-1 mx-4"
+                                    >
+                                        concluir
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    )
+                }
+
                 {!loading &&
-                    todos.map((todo, idx) => (
+                    todos.map((todo) => (
                         <div
                             key={todo.id}
                             className="line-left pl-2 st:line-center"
@@ -68,9 +143,7 @@ export default function TodoList({ user }: todoListProps) {
                                 <Todo
                                     content={todo.title}
                                     state={todo.completed}
-                                    changeState={() =>
-                                        changeItemState(todo.id, idx)
-                                    }
+                                    changeState={() => changeItemState(todo.id)}
                                 />
                             </div>
                         </div>
