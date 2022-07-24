@@ -38,6 +38,7 @@ export default function TodoList({ user }: todoListProps) {
         getTodos();
     }, []);
 
+    // ? change the state of the todo
     async function changeItemState(id: number) {
         let output = todos.map((item) =>
             item.id === id ? { ...item, state: !item.state } : item
@@ -45,6 +46,7 @@ export default function TodoList({ user }: todoListProps) {
         setTodos(output);
     }
 
+    // ? add a new todo
     async function addNewTodo(e: Event) {
         e.preventDefault();
         try {
@@ -133,26 +135,32 @@ export default function TodoList({ user }: todoListProps) {
                     )
                 }
 
-                {!loading &&
-                    todos.map((todo) => (
-                        <div
-                            key={todo.id}
-                            className="line-left pl-2 st:line-center"
-                        >
-                            <div className="st:w-10/12 md:w-3/4 lg:w-1/2 mt-4 line-left items-start">
-                                <Todo
-                                    content={todo.title}
-                                    state={todo.completed}
-                                    changeState={() => changeItemState(todo.id)}
-                                />
+                {
+                    // * todo list
+                    !loading &&
+                        todos.map((todo) => (
+                            <div
+                                key={todo.id}
+                                className="line-left pl-2 st:line-center"
+                            >
+                                <div className="st:w-10/12 md:w-3/4 lg:w-1/2 mt-4 line-left items-start">
+                                    <Todo
+                                        content={todo.title}
+                                        state={todo.completed}
+                                        changeState={() =>
+                                            changeItemState(todo.id)
+                                        }
+                                    />
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))
+                }
             </div>
         </div>
     );
 }
 
+// ? server side requisitions
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const url = ctx.query;
     try {

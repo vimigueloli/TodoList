@@ -10,6 +10,7 @@ interface TodoProps {
 export default function Todo({ content, state, changeState }: TodoProps) {
     const [checked, setChecked] = useState<boolean>(state);
 
+    // ? change the state of the todo
     function handleChange() {
         changeState();
         setChecked(!checked);
