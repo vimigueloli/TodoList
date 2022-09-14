@@ -1,4 +1,4 @@
-# Github Details
+# Todo List
 
 ![GitHub](https://img.shields.io/github/license/vimigueloli/TodoList?color=brigthgreen) <br/>
 
